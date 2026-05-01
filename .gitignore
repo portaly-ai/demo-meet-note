@@ -47,7 +47,8 @@ next-env.d.ts
 # InsForge & AI agent skills
 .insforge
 .agent
-.agents
+.agents/*
+!.agents/skills/
 .augment
 .claude
 .cline

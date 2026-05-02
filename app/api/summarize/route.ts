@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          "AI summarization is temporarily unavailable. If you are the admin, set ANTHROPIC_API_KEY in Vercel.",
+          "AI summarization is temporarily unavailable. If you are the admin, set ANTHROPIC_API_KEY in your environment.",
         code: "missing_key",
       },
       { status: 503 },

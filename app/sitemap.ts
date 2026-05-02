@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://meetnote-ai.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 ).trim();
 
 export default function sitemap(): MetadataRoute.Sitemap {

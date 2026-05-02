@@ -71,7 +71,7 @@ export default function PrivacyPage() {
           <strong>Resend:</strong> delivers system emails.
         </li>
         <li>
-          <strong>Vercel:</strong> hosting and analytics.
+          <strong>Hosting infrastructure:</strong> serves the application.
         </li>
       </ul>
 

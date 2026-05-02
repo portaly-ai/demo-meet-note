@@ -4,7 +4,7 @@
  */
 export function StructuredData() {
   const SITE_URL = (
-    process.env.NEXT_PUBLIC_SITE_URL || "https://meetnote-ai.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ).trim();
 
   const data = {

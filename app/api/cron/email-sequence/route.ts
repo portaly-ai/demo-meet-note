@@ -14,8 +14,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Vercel Cron 入口 — 每小時跑一次（vercel.json）。
- * Vercel 用 `Authorization: Bearer ${CRON_SECRET}` header 驗證。
+ * Scheduled cron endpoint — intended to run once per hour.
+ * Callers must pass `Authorization: Bearer ${CRON_SECRET}` header for authentication.
+ * Configure your cron scheduler (GitHub Actions, system cron, platform scheduler, etc.)
+ * to hit GET /api/cron/email-sequence with that header on the desired schedule.
  */
 export async function GET(req: Request) {
   if (env.CRON_SECRET) {

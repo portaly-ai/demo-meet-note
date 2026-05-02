@@ -11,7 +11,7 @@ AI 會議筆記 SaaS 樣板（Next.js 16 + Insforge BaaS）。可 fork 的工程
 - Next.js 16 (App Router) + React 19 + Tailwind v4
 - Insforge（Auth + Database + server APIs）
 - OpenAI Whisper（轉錄）+ Claude Sonnet 4.6（摘要，tool use）
-- Resend + Vercel Cron
+- Resend + scheduled cron (GitHub Actions, system cron, or your platform's scheduler)
 - Payment：模板已預埋，待選接
 
 ## 常用指令
@@ -35,7 +35,7 @@ AI 會議筆記 SaaS 樣板（Next.js 16 + Insforge BaaS）。可 fork 的工程
 
 ## 開發規範
 - **Next.js 16 注意事項**：`middleware.ts` 改名 `proxy.ts`、函式 `proxy`。`cookies()`、`headers()`、`params`、`searchParams` 全部 async 必須 `await`。
-- **環境變數讀取一律 `.trim()`**：見 `lib/env.ts`，避免 Vercel CLI 輸出帶換行符。
+- **環境變數讀取一律 `.trim()`**：見 `lib/env.ts`，避免 CLI 工具輸出帶換行符。
 - **Payment webhook（未來串接時）三道驗證不能省**：簽名 / timestamp / 冪等都是必要，遇到驗證失敗只能 debug 不能繞過。
 - **AI 摘要必須 tool use**：Claude 的 `summarizeMeeting` 用 tool_choice 強制 JSON。
 - **DB schema 以 Insforge migration 為準**：`migrations/20260429071058_init.sql` 是目前 source of truth。複雜操作用 migration 裡的 RPC function。
@@ -43,10 +43,10 @@ AI 會議筆記 SaaS 樣板（Next.js 16 + Insforge BaaS）。可 fork 的工程
 - **模板交付不要包含私有設定**：不要 commit `.env.local`、`.vercel/`、`.insforge/`、`.mcp.json`、`node_modules/`。
 
 ## 部署
-- Vercel：直接連 Repo
+- 可部署到任何支援 Node.js 的環境（容器平台、雲端 VM、PaaS、自管主機等）
 - 環境變數：見 `.env.example`（Insforge × 2、AI × 2、Resend × 2、Cron × 1；Payment 待串接時補上）
 - 第一次：在 Insforge 套用 `migrations/20260429071058_init.sql`
-- Cron：`vercel.json` 已配置每小時跑 `/api/cron/email-sequence`（quota 警告/超額信目前以 `PAYMENT_ENABLED=false` 暫關，待 payment 串好恢復）
+- Cron：每小時對 `/api/cron/email-sequence` 發 GET 請求（帶 `Authorization: Bearer <CRON_SECRET>` header）；可用 GitHub Actions、系統 cron、或平台排程器配置。若使用 Vercel，`vercel.json` 已提供對應設定範例（quota 警告/超額信目前以 `PAYMENT_ENABLED=false` 暫關，待 payment 串好恢復）
 
 ## 串接 Payment 時的 checklist
 1. 新增 `app/api/checkout/route.ts`（呼叫 provider 建立 checkout session，回 `paymentUrl`）

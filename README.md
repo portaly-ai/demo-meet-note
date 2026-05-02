@@ -15,7 +15,7 @@ This repository is intended as a template, not a real product being sold.
 | AI transcription | OpenAI Whisper |
 | AI summarization | Anthropic Claude structured output |
 | Paid-tier scaffold | Plan column (free/pro/team), per-plan quota, pricing page, upgrade UI, quota emails (provider TBD) |
-| Email automation | Resend templates plus Vercel Cron |
+| Email automation | Resend templates plus scheduled cron endpoint |
 | SEO/legal | Metadata, sitemap, robots, OG image, changelog, privacy, terms |
 | Demo UI | English-first marketing site with Traditional Chinese toggle |
 
@@ -39,7 +39,7 @@ Minimum local app:
 Full SaaS demo:
 
 - Resend for lifecycle emails
-- Vercel for deployment and cron
+- A cron scheduler (GitHub Actions, system cron, or your platform's scheduler) to trigger `/api/cron/email-sequence` hourly
 
 Optional agent workflow:
 
@@ -140,6 +140,23 @@ INSFORGE_API_KEY=
 
 It creates a temporary test user and verifies tables, auth, profile trigger behavior, and RPC usage counters. Review the script before running it against production data.
 
+## Deployment
+
+This is a standard Next.js application and can be deployed to any environment that supports Node.js:
+
+- **Containers / self-hosted**: build with `npm run build`, run with `npm run start`. Expose port `3000` (or set `PORT`).
+- **PaaS / cloud VM**: any provider (Railway, Render, Fly.io, AWS, GCP, Azure, etc.) — follow the provider's Node.js deployment guide.
+- **Vercel**: connect the repository; Vercel detects Next.js automatically. `vercel.json` in the repo root provides an optional hourly cron config for Vercel deployments. Delete or ignore it when deploying elsewhere.
+
+**Cron endpoint**: `/api/cron/email-sequence` should be called with a GET request every hour. Pass `Authorization: Bearer <CRON_SECRET>` in the header.
+
+- Vercel: configured automatically via `vercel.json`.
+- GitHub Actions: add a `schedule: [{cron: "0 * * * *"}]` workflow that calls the endpoint.
+- System cron: `0 * * * * curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/email-sequence`.
+- Any other platform: use the platform's built-in scheduler or a service like EasyCron.
+
+Set `NEXT_PUBLIC_SITE_URL` to your deployed URL before building for production.
+
 ## File Map
 
 ```text
@@ -158,7 +175,7 @@ app/
     summarize/                      Anthropic summary endpoint
     notes/[id]/share/               Generate share token (Pro-gated)
     email/welcome/                  Optional welcome email endpoint
-    cron/email-sequence/            Hourly Resend lifecycle email cron
+    cron/email-sequence/            Hourly Resend lifecycle email cron (schedule via GitHub Actions, system cron, or platform scheduler)
 
 components/
   auth/                             Auth shell and form
@@ -197,11 +214,11 @@ The `webhook_events` table, `plan` / `subscription_id` / `current_period_end` co
 
 Before handing this repository to another engineer:
 
-1. Do not include `.env.local`, `.vercel/`, `.insforge/`, `node_modules/`, or local MCP config.
+1. Do not include `.env.local`, `.vercel/`, `.insforge/`, `node_modules/`, or local MCP/platform config.
 2. Keep `.env.example` accurate and free of real credentials.
 3. Ask the engineer to create their own Insforge, OpenAI, Anthropic, and Resend credentials.
 4. If they want billing, follow the [Wiring a Payment Provider](#wiring-a-payment-provider) checklist.
-5. If they do not need email automation, they can leave Resend variables empty and disable the Vercel cron.
+5. If they do not need email automation, they can leave Resend variables empty and skip scheduling the cron endpoint.
 6. If they fork for a different product, replace demo copy, example notes, pricing, email templates, metadata, and legal pages.
 7. Run `npm run typecheck` and `npm run build` before deploying.
 

@@ -11,7 +11,7 @@ const notoSansTC = Noto_Sans_TC({
 });
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://meetnote-ai.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 ).trim();
 
 export const metadata: Metadata = {

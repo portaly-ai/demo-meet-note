@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          "Transcription is temporarily unavailable. If you are the admin, set OPENAI_API_KEY in Vercel.",
+          "Transcription is temporarily unavailable. If you are the admin, set OPENAI_API_KEY in your environment.",
         code: "missing_key",
       },
       { status: 503 },
